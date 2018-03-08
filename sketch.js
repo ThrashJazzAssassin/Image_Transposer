@@ -71,6 +71,7 @@ function draw() {
 	}
 	if (img) {
 		image(img, 0, 0, img.width, img.height);
+		// image(img, 0, img.height, width, img.height, map(mouseX, 0, width, 0, img.width), 0, width, img.height);
 		noStroke();
 		textAlign(LEFT);
 		text(" " + frameNum + " frames with a width of " + snapper, snapper, height - 200);
