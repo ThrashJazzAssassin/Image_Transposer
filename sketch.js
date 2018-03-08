@@ -46,7 +46,6 @@ function reStack() {
 	img2.loadPixels();
 	let counter = 0;
 	for (let i = 0; i < frameNum; i++) {
-		// console.log("frame:" + i);
 		for (let y = 0; y < img.height; y++) {
 			for (let x = 0; x < snapper; x++) {
 				var index = ((i * snapper) + (y * img.width) + x) * 4;
@@ -72,7 +71,7 @@ function draw() {
 	}
 	if (img) {
 		image(img, 0, 0, img.width, img.height);
-		noStroke()
+		noStroke();
 		textAlign(LEFT);
 		text(" " + frameNum + " frames with a width of " + snapper, snapper, height - 200);
 		colorMode(HSB, 100);
@@ -84,9 +83,9 @@ function draw() {
 		copy(Math.floor(mouseX - 40), 0, 80, 40, 0, height - 80, width, 160);
 		if (rendered) {
 			i = frameCount % 255;
-			fill(i, 255, 128)
+			fill(i, 255, 128);
 			text("RENDERED!", width / 2, height / 2);
-		};
+		}
 	}
 }
 
