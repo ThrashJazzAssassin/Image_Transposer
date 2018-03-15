@@ -1,12 +1,10 @@
 let img;
-// let img2;
 let button;
 let button2;
 let button3;
 let ctlType;
 let snapper = 10000;
 let frameNum;
-let rendered = 0;
 let fileName;
 let frameHeight;
 
@@ -26,11 +24,11 @@ function setup() {
 	button.hide();
 	createP(" ");
 	ctlType = createSelect();
-	ctlType.option('Knob', 1);
-	ctlType.option('Slider', 2);
-	ctlType.option('Button', 3);
-	ctlType.option('Meter', 4);
-	ctlType.option('Misc', 5);
+	ctlType.option('Knob', 0);
+	ctlType.option('Slider', 1);
+	ctlType.option('Button', 2);
+	ctlType.option('Meter', 3);
+	ctlType.option('Misc', 4);
 	ctlType.hide();
 	button3 = createButton("Save .KNB file");
 	button3.mouseClicked(knb);
@@ -105,7 +103,6 @@ function reStack() {
 		}
 	}
 	img2.updatePixels();
-	rendered = 1;
 	button2.hide();
 	button.show();
 	img = img2;
