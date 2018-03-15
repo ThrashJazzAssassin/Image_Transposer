@@ -5,47 +5,76 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-
 	<title>Horizontal to Vertical Stacked Image Transposer</title>
-
 	<script src="libraries/p5.js"></script>
 	<script src="libraries/p5.dom.js"></script>
-	<script src="libraries/p5.sound.js"></script>
 	<script src="sketch.js"></script>
-
 	<style>
-		body {
-			margin: 0;
-			padding: 0;
-			/* overflow: hidden; */
+		/* body {} */
+
+		* {
+			font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif, Cochin, Georgia, Times, 'Times New Roman', serif
 		}
 
 		canvas {
-			margin: auto;
-			/* float: left; */
+			float: left;
 		}
 
 		p {
-			display: inline;
-			padding: 20px;
+			/* display: inline; */
+			/* padding: 20px; */
 		}
 
-		#dropzone {
-			padding: 24px;
-			border-style: dashed;
-			font-size: 24pt;
+		#UI {
+			border: solid slategrey;
+			width: 200px;
+			display: inline-block;
+			padding: 20px;
+			float: right;
+			display: none;
+		}
+
+		button {
+			display: block;
+		}
+
+		footer {
+			background-color: lightgray;
+			position: absolute;
+			bottom: 20px;
+			padding: 10px;
 		}
 	</style>
 </head>
 
 <body>
 	<header>
-		<h1>Horizontal to Vertical Stacked Image Transposer</h1>
-		Not sure why, but this does not reliably work correctly with Firefox, edge or IE for images with a width over about 8000px.
-		Chrome seems to work ok
+		<h1>LBX Stripper KNB Utility</h1>
 	</header>
 
-	<footer></footer>
+	<form id="UI">
+		<input type="radio" name="orientation" value="V"> Vertical
+		<br>
+		<input type="radio" name="orientation"> Horizontal
+		<p>Click at first frame</p>
+		<button id="transpose">Transpose</button>
+		<br>
+		<button id="saveImage">Save Image</button>
+		<br>
+		<input type="radio" name="knb" value="K"> Knob
+		<br>
+		<input type="radio" name="knb"> Slider
+		<br>
+		<input type="radio" name="knb"> Button
+		<br>
+		<input type="radio" name="knb"> Meter
+		<br>
+		<input type="radio" name="knb"> Misc
+		<br>
+		<button>Save .KNB File</button>
+	</form>
+	<footer>Not sure why, but this does not reliably work correctly with Firefox, edge or IE for images with a width over about 8000px.
+		Chrome seems to work ok</footer>
 </body>
 
 </html>

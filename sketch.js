@@ -1,48 +1,95 @@
-/*jshint esversion: 6 */
 let img;
-let img2;
+// let img2;
 let button;
 let button2;
+let button3;
+let ctlType;
 let snapper = 10000;
 let frameNum;
-rendered = 0;
+let rendered = 0;
 let fileName;
-let i;
+let frameHeight;
 
 function setup() {
-	let canvas = createCanvas(window.innerWidth, 300);
-	noSmooth();
-	textAlign(CENTER);
+	let canvas = createCanvas(500, 500);
 	canvas.drop(gotFile);
-	createP(" Click at split point ");
-	button2 = createButton("Render");
+	noSmooth();
+	orientation = createSelect();
+	orientation.option('Vertical', 'vertical');
+	orientation.option('Horizontal', 'horizontal');
+	orientation.changed(oriChanged);
+	button2 = createButton("Transpose Hor ->Ver");
 	button2.mouseClicked(reStack);
-	createP(" then ");
+	button2.hide();
 	button = createButton("Save New Image");
 	button.mouseClicked(saveNewImage);
+	button.hide();
+	createP(" ");
+	ctlType = createSelect();
+	ctlType.option('Knob', 1);
+	ctlType.option('Slider', 2);
+	ctlType.option('Button', 3);
+	ctlType.option('Meter', 4);
+	ctlType.option('Misc', 5);
+	ctlType.hide();
+	button3 = createButton("Save .KNB file");
+	button3.mouseClicked(knb);
+	button3.hide();
+	fileStats = createP("");
+}
+
+function oriChanged() {
+	if (orientation.value() == 'vertical') {
+		button2.hide();
+		button.hide();
+		snapper = 10000;
+	}
+	if (orientation.value() == 'horizontal') {
+		button2.show();
+		snapper = 10000;
+	}
+
+}
+
+function knb() {
+	let knbString = ["{{",
+		"[\"fn\"]=\"" + fileName + "\",",
+		"[\"ctltype\"]=" + ctlType.value() + ",",
+		"[\"frames\"]=" + frameNum + ",",
+		"[\"cellh\"]=" + frameHeight + ",",
+		"},",
+		"}"];
+	save(knbString, fileName.substr(0, fileName.length - 4), "knb");
 }
 
 function mouseClicked() {
-	if (img && mouseY < height) {
+	if (orientation.value() == 'horizontal' && mouseX > 0 && mouseX < width) {
 		snapper = findFactor(mouseX, img.width);
+		button3.show();
+		ctlType.show();
+		console.log("clicked");
+
+	}
+	if (orientation.value() == 'vertical' && mouseX > 0 && mouseX < width) {
+		snapper = findFactor(mouseY, img.height);
+		button3.show();
+		ctlType.show();
+		console.log("clicked");
 	}
 }
 
 function gotFile(file) {
-	createP(file.name);
 	fileName = file.name;
-	img = loadImage(file.data, showImageStats);
-	// snapper = 100;
+	img = loadImage(file.data, initImage);
 }
 
-function showImageStats() {
-	createP("Height:" + img.height);
-	createP("Width:" + img.width);
+function initImage() {
+	fileStats.html(fileName + " | Height:" + img.height + " | Width:" + img.width);
 }
 
 function reStack() {
 	img.loadPixels();
-	img2 = createImage(snapper, frameNum * img.height);
+	let img2 = createImage(snapper, frameNum * img.height);
 	img2.loadPixels();
 	let counter = 0;
 	for (let i = 0; i < frameNum; i++) {
@@ -60,6 +107,8 @@ function reStack() {
 	img2.updatePixels();
 	rendered = 1;
 	button2.hide();
+	button.show();
+	img = img2;
 }
 
 function draw() {
@@ -67,36 +116,34 @@ function draw() {
 	fill(255);
 	if (!img) {
 		noStroke();
-		text("drop image here", width / 2, height / 2);
+		text("drop image here", 200, height / 2);
 	}
 	if (img) {
 		image(img, 0, 0, img.width, img.height);
-		// image(img, 0, img.height, width, img.height, map(mouseX, 0, width, 0, img.width), 0, width, img.height);
 		noStroke();
-		textAlign(LEFT);
-		text(" " + frameNum + " frames with a width of " + snapper, snapper, height - 200);
 		colorMode(HSB, 100);
-		stroke(mouseY, 255, 128, 60);
-		// text(mouseX, mouseX + 20, mouseY);
-		line(snapper, 0, snapper, height);
-		stroke(mouseY, 0, 128, 30);
-		line(mouseX, 0, mouseX, height);
-		copy(Math.floor(mouseX - 40), 0, 80, 40, 0, height - 80, width, 160);
-		if (rendered) {
-			i = frameCount % 255;
-			fill(i, 255, 128);
-			text("RENDERED!", width / 2, height / 2);
+		if (orientation.value() == "horizontal") {
+			stroke(mouseY, 255, 128, 60);
+			line(snapper, 0, snapper, height);
+			stroke(mouseY, 0, 128, 30);
+			line(mouseX, 0, mouseX, height);
+			text(" " + frameNum + " frames with a width of " + snapper, snapper, img.height + 20);
+			copy(Math.floor(mouseX - 40), 0, 80, 40, 0, height - 80, width, 160);
+		}
+		if (orientation.value() == "vertical") {
+			stroke(mouseY, 255, 128, 60);
+			line(0, snapper, width, snapper);
+			stroke(mouseY, 0, 128, 30);
+			line(0, mouseY, width, mouseY);
+
+			text(" " + frameNum + " frames with a height of " + snapper, img.width, snapper);
+			copy(0, Math.floor(mouseY - 40), 40, 80, width - 80, 0, 160, height);
 		}
 	}
 }
 
 function saveNewImage() {
-	save(img2, fileName);
-}
-
-function preview() {
-	reStack();
-	image(img2, 0, 0, 200, 200);
+	save(img, fileName);
 }
 
 function findFactor(x, num) {
@@ -104,8 +151,13 @@ function findFactor(x, num) {
 	while (num % factor !== 0) {
 		factor++;
 	}
-	frameNum = img.width / factor;
-	// console.log("frameNum:" + frameNum);
-	// console.log("Snapper:" + factor);
+	if (orientation.value() == 'horizontal') {
+		frameNum = img.width / factor;
+		frameHeight = img.height;
+	}
+	if (orientation.value() == 'vertical') {
+		frameNum = img.height / factor;
+		frameHeight = factor;
+	}
 	return factor;
 }
