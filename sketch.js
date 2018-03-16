@@ -1,52 +1,52 @@
 let img;
-let button;
-let button2;
-let button3;
+let saveImgButton;
+let transposeButton;
+let saveKnbButton;
 let ctlType;
 let snapper = 10000;
 let frameNum;
 let fileName;
 let frameHeight;
+let guideLine;
 
 function setup() {
 	let canvas = createCanvas(500, 500);
 	canvas.drop(gotFile);
 	noSmooth();
-	orientation = createSelect();
+	orientation = createRadio();
 	orientation.option('Vertical', 'vertical');
 	orientation.option('Horizontal', 'horizontal');
 	orientation.changed(oriChanged);
-	button2 = createButton("Transpose Hor ->Ver");
-	button2.mouseClicked(reStack);
-	button2.hide();
-	button = createButton("Save New Image");
-	button.mouseClicked(saveNewImage);
-	button.hide();
+	transposeButton = createButton("Transpose Hor ->Ver");
+	transposeButton.mouseClicked(transpose);
+	transposeButton.attribute('disabled', true);
+	saveImgButton = createButton("Save New Image");
+	saveImgButton.mouseClicked(saveNewImage);
+	saveImgButton.attribute('disabled', true);
 	createP(" ");
-	ctlType = createSelect();
+	ctlType = createRadio();
 	ctlType.option('Knob', 0);
 	ctlType.option('Slider', 1);
 	ctlType.option('Button', 2);
 	ctlType.option('Meter', 3);
 	ctlType.option('Misc', 4);
-	ctlType.hide();
-	button3 = createButton("Save .KNB file");
-	button3.mouseClicked(knb);
-	button3.hide();
+	ctlType.value('Knob');
+	// ctlType.attribute('disabled', true);
+	saveKnbButton = createButton("Save .KNB file");
+	saveKnbButton.mouseClicked(knb);
+	saveKnbButton.attribute('disabled', true);
 	fileStats = createP("");
+	// textSize(12);
 }
 
 function oriChanged() {
 	if (orientation.value() == 'vertical') {
-		button2.hide();
-		button.hide();
-		snapper = 10000;
+		transposeButton.attribute('disabled', true);
+		saveImgButton.attribute('disabled', true);
 	}
 	if (orientation.value() == 'horizontal') {
-		button2.show();
-		snapper = 10000;
 	}
-
+	snapper = 10000;
 }
 
 function knb() {
@@ -63,16 +63,19 @@ function knb() {
 function mouseClicked() {
 	if (orientation.value() == 'horizontal' && mouseX > 0 && mouseX < width) {
 		snapper = findFactor(mouseX, img.width);
-		button3.show();
-		ctlType.show();
-		console.log("clicked");
+		frameNum = img.width / snapper;
+		frameHeight = img.height;
+		saveKnbButton.removeAttribute('disabled');
+		ctlType.removeAttribute('disabled');
+		transposeButton.removeAttribute('disabled');
 
 	}
 	if (orientation.value() == 'vertical' && mouseX > 0 && mouseX < width) {
 		snapper = findFactor(mouseY, img.height);
-		button3.show();
-		ctlType.show();
-		console.log("clicked");
+		frameNum = img.height / snapper;
+		frameHeight = snapper;
+		saveKnbButton.removeAttribute('disabled');
+		ctlType.removeAttribute('disabled');
 	}
 }
 
@@ -85,7 +88,7 @@ function initImage() {
 	fileStats.html(fileName + " | Height:" + img.height + " | Width:" + img.width);
 }
 
-function reStack() {
+function transpose() {
 	img.loadPixels();
 	let img2 = createImage(snapper, frameNum * img.height);
 	img2.loadPixels();
@@ -103,8 +106,8 @@ function reStack() {
 		}
 	}
 	img2.updatePixels();
-	button2.hide();
-	button.show();
+	transposeButton.attribute('disabled', true);
+	saveImgButton.removeAttribute('disabled');
 	img = img2;
 }
 
@@ -117,22 +120,48 @@ function draw() {
 	}
 	if (img) {
 		image(img, 0, 0, img.width, img.height);
-		noStroke();
 		colorMode(HSB, 100);
+		stroke(mouseY, 0, 128, 20);
 		if (orientation.value() == "horizontal") {
+			strokeWeight(1);
+			//Draw mouse guides
+			if (mouseX < width) {
+				guideLine = mouseX;
+				for (let i = 0; i < 16; i++) {
+					line(guideLine, 0, guideLine, height);
+					guideLine += mouseX;
+				}
+			}
+			//Draw Snap lines
 			stroke(mouseY, 255, 128, 60);
-			line(snapper, 0, snapper, height);
-			stroke(mouseY, 0, 128, 30);
-			line(mouseX, 0, mouseX, height);
+			strokeWeight(2)
+			snapLine = snapper;
+			for (let i = 0; i < 16; i++) {
+				line(snapLine, 0, snapLine, height);
+				snapLine += snapper;
+			}
+			noStroke();
 			text(" " + frameNum + " frames with a width of " + snapper, snapper, img.height + 20);
 			copy(Math.floor(mouseX - 40), 0, 80, 40, 0, height - 80, width, 160);
 		}
 		if (orientation.value() == "vertical") {
+			strokeWeight(1);
+			if (mouseX < width) {
+				stroke(mouseY, 0, 128, 30);
+				guideLine = mouseY;
+				for (let i = 0; i < 16; i++) {
+					line(0, guideLine, width, guideLine);
+					guideLine += mouseY;
+				}
+			}
 			stroke(mouseY, 255, 128, 60);
-			line(0, snapper, width, snapper);
-			stroke(mouseY, 0, 128, 30);
-			line(0, mouseY, width, mouseY);
-
+			strokeWeight(2);
+			snapLine = snapper;
+			for (let i = 0; i < 16; i++) {
+				line(0, snapLine, width, snapLine);
+				snapLine += snapper;
+			}
+			noStroke();
 			text(" " + frameNum + " frames with a height of " + snapper, img.width, snapper);
 			copy(0, Math.floor(mouseY - 40), 40, 80, width - 80, 0, 160, height);
 		}
@@ -144,17 +173,13 @@ function saveNewImage() {
 }
 
 function findFactor(x, num) {
-	let factor = Math.floor(x);
-	while (num % factor !== 0) {
-		factor++;
+	let factor = new Array(2).fill(Math.floor(x));
+	while (num % factor[0] !== 0) {
+		factor[0]++;
+		if (num % factor[1] == 0) {
+			return factor[1];
+		}
+		factor[1]--;
 	}
-	if (orientation.value() == 'horizontal') {
-		frameNum = img.width / factor;
-		frameHeight = img.height;
-	}
-	if (orientation.value() == 'vertical') {
-		frameNum = img.height / factor;
-		frameHeight = factor;
-	}
-	return factor;
+	return factor[0];
 }
