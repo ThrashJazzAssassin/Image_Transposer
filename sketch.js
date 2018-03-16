@@ -16,6 +16,7 @@ function setup() {
 	orientation = createRadio();
 	orientation.option('Vertical', 'vertical');
 	orientation.option('Horizontal', 'horizontal');
+	orientation.value('vertical');
 	orientation.changed(oriChanged);
 	transposeButton = createButton("Transpose Hor ->Ver");
 	transposeButton.mouseClicked(transpose);
@@ -25,13 +26,12 @@ function setup() {
 	saveImgButton.attribute('disabled', true);
 	createP(" ");
 	ctlType = createRadio();
-	ctlType.option('Knob', 0);
-	ctlType.option('Slider', 1);
-	ctlType.option('Button', 2);
-	ctlType.option('Meter', 3);
-	ctlType.option('Misc', 4);
-	ctlType.value('Knob');
-	// ctlType.attribute('disabled', true);
+	ctlType.option('Knob', '0');
+	ctlType.option('Slider', '1');
+	ctlType.option('Button', '2');
+	ctlType.option('Meter', '3');
+	ctlType.option('Misc', '4');
+	ctlType._getInputChildrenArray()[0].checked = true;
 	saveKnbButton = createButton("Save .KNB file");
 	saveKnbButton.mouseClicked(knb);
 	saveKnbButton.attribute('disabled', true);
@@ -42,7 +42,7 @@ function setup() {
 function oriChanged() {
 	if (orientation.value() == 'vertical') {
 		transposeButton.attribute('disabled', true);
-		saveImgButton.attribute('disabled', true);
+		// saveImgButton.attribute('disabled', true);
 	}
 	if (orientation.value() == 'horizontal') {
 	}
@@ -108,6 +108,8 @@ function transpose() {
 	img2.updatePixels();
 	transposeButton.attribute('disabled', true);
 	saveImgButton.removeAttribute('disabled');
+	orientation.value('vertical');
+	snapper = img.height;
 	img = img2;
 }
 
