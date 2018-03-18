@@ -82,6 +82,7 @@ function mouseClicked() {
 function gotFile(file) {
 	fileName = file.name;
 	img = loadImage(file.data, initImage);
+	saveImgButton.attribute('disabled', true);
 }
 
 function initImage() {
