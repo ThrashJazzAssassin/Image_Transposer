@@ -162,7 +162,7 @@ function draw() {
 				}
 			}
 			//Draw Snap lines
-			stroke(mouseY, 255, 128, 60);
+			stroke(mouseX, 255, 128, 60);
 			strokeWeight(2);
 			snapLine = snapper;
 			for (let i = 0; i < frameNum; i++) {
