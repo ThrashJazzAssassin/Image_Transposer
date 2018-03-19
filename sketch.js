@@ -83,6 +83,7 @@ function gotFile(file) {
 	fileName = file.name;
 	img = loadImage(file.data, initImage);
 	saveImgButton.attribute('disabled', true);
+	snapper = 10000;
 }
 
 function initImage() {
