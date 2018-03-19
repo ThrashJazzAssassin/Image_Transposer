@@ -126,11 +126,14 @@ function draw() {
 		colorMode(HSB, 100);
 		stroke(mouseY, 0, 128, 20);
 		if (orientation.value() == "horizontal") {
-			strokeWeight(1);
 			//Draw mouse guides
+			strokeWeight(1);
 			if (mouseX < width) {
 				guideLine = mouseX;
-				for (let i = 0; i < 16; i++) {
+				while (guideLine < min(width, img.width) && guideLine > 2) {
+					if (guideLine > img.width) {
+						break;
+					}
 					line(guideLine, 0, guideLine, height);
 					guideLine += mouseX;
 				}
@@ -139,34 +142,36 @@ function draw() {
 			stroke(mouseY, 255, 128, 60);
 			strokeWeight(2)
 			snapLine = snapper;
-			for (let i = 0; i < 16; i++) {
-				line(snapLine, 0, snapLine, height);
+			for (let i = 0; i < frameNum; i++) {
+				line(snapLine, 0, snapLine, img.height);
 				snapLine += snapper;
 			}
 			noStroke();
 			text(" " + frameNum + " frames with a width of " + snapper, snapper, img.height + 20);
-			copy(Math.floor(mouseX - 40), 0, 80, 40, 0, height - 80, width, 160);
+			copy(Math.floor(mouseX - 50), 0, 100, 50, 0, 350, 500, 250);
 		}
 		if (orientation.value() == "vertical") {
+			//Draw mouse guides
 			strokeWeight(1);
 			if (mouseX < width) {
 				stroke(mouseY, 0, 128, 30);
 				guideLine = mouseY;
-				for (let i = 0; i < 16; i++) {
+				while (guideLine < min(height, img.height) && guideLine > 2) {
 					line(0, guideLine, width, guideLine);
 					guideLine += mouseY;
 				}
 			}
+			//Draw Snap lines
 			stroke(mouseY, 255, 128, 60);
 			strokeWeight(2);
 			snapLine = snapper;
-			for (let i = 0; i < 16; i++) {
-				line(0, snapLine, width, snapLine);
+			for (let i = 0; i < frameNum; i++) {
+				line(0, snapLine, img.width, snapLine);
 				snapLine += snapper;
 			}
 			noStroke();
-			text(" " + frameNum + " frames with a height of " + snapper, img.width, snapper);
-			copy(0, Math.floor(mouseY - 40), 40, 80, width - 80, 0, 160, height);
+			text(" " + frameNum + " frames with a height of " + snapper, img.width + 1, snapper - 1);
+			copy(0, Math.floor(mouseY - 50), 50, 100, 350, 0, 250, 500);
 		}
 	}
 }
